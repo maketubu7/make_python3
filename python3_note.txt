@@ -1,0 +1,299 @@
+python3 
+    `pyspark知识点 => house_etl.py   msg_etl`
+1、进制表示与转换
+    十进制 12 34
+    二进制 ob11 ob111    向二进制转换 bin(data)
+    八进制 0o11 0o23     向八进制转换 oct(data)
+    十六进制 0x11 0x1F   向十六进制转换 hex(data)
+2、单引号、双引号、三引号的区别
+    单、双引号在为了表示字符串里存在引号的情况
+    三引号是为了表示多行字符串而存在
+3、原字符串 => 所见即所得
+    r'string'   => r''  字符串前面加 `r` 即为原字符串，原样输出内容
+4、字符串的运算  (自己学习string的相关api)                                                                                      
+    'string'[k:n]   取索引位置k-n的部分   左闭右开   n可取负数  表示倒数第几位 左闭右开
+    'data1 data2'.index(' ')返回空格位置所在的索引
+5、列表定义
+    a = ['data','data1','data2']   b = ['data3']  列表相加即组合为一个列表 a+b
+    a =[['data','data1'],['data2','data3']]  嵌套列表
+6、序列   str list tuple (每一个元素都会分配一个索引)
+    序列的切片 var[m:n:k]   切片m-n 步长为k
+    [m:]   从m到序列结束    [-n:]  取倒数第几个到结束
+7、max min 可以去序列里的最大值 最小值   
+    对于字符串 ord('char')可以知道对应的序列号  即为max min 的取值规则
+8、集合   set  无序  唯一
+    a = {1,2,3,4,5} 集合无法切片
+    a = {1,2,3,4,5} b = {2,3}   a - b 求两个集合的差集,以调用者为准 {1,4,5} 
+    a = {1,2,3,4,5} b = {2,7}   a & b 两个集合的交集 {2}
+    a = {1,2,3,4}   b = {2,3,5} a | b 两个集合的不重复并集
+9、字典   dict  key唯一    value 不做要求
+    dict 的key必须是不可变类型  如int str 元组 => 不可变 不能用序列 集合 => 可变
+    a = {key1:value1,key2:valaue2}    a[key1] = value1
+基本变量类型参考  思维导图 => python的基本类型
+
+10、变量的命名规则
+    数字  字母 下划线随意组合 但是数字不能放在开头
+    python的保留关键字不能用作变量名 如 if and import等
+11、引用类型和值类型
+    a = 1 b = a a = 3    最后b = 1   这是值类型不可改变
+    a = [1] b = a a[0] = 2 最后 b = [2]  引用类型可改变 随着引用的改变而改变
+    int str tuple （不可改变 值类型）  set list dict （可改变 引用类型）
+12、元组不可变  但是list可变
+    如果 a = (1,2,[3,4]) 则元组里的list里的元素是可以改变的 a[2][1] = 6 => a = (1,2,[3,6])
+    所以如果元组里包含，可变的数据结构，则该数据结构是可以改变的  比如list 
+13、关系运算符
+    a=1 a+=a>1 => 这里的结果为 a=1 (这里会先做关系运算符，再做赋值运算符，可等于 a+=0 因为结果为false 为int中的0)
+    在比较非数字的类型，其实是比较其自身的ASCII码， ord(data)  可查看其对应的ASCII码
+14、逻辑运算符
+    数字 int float 只有0 在参与逻辑运算时会被认为是false    其余都为 true
+    字符串 str  只有''（空字符串）会被认为是false    其余都为 true
+    其余结构 list set tuple 只有为空时会被认为是false    其余为true
+    and 和 or 的返回值   返回最后一个能够判断返回值的值,若能更快的判断则更快的返回   比如 1 and 2 会返回2 因为2会参与计算，参与完就直接返回就可以了
+15、成员运算符
+    针对dict的成员运算符，是针对dict的key进行计算的  data in dict{key,value}
+16、身份运算符
+    == 比较的是 值是否相等    is 比较的是两个的身份是否相等（内存地址）
+    a = {1,2,3} b = {2,1,3}  a == b => true  集合是无序的     a is b => false 内存地址不同
+    集合和元组对顺序是有要求的，必须完全一致才会返回true
+17、判断变量的值、身份与类型(id、value、type)
+    type(a) == int  a的类型为int返回true  为其他的返回false
+    isinstance(a,str)  a的类型为str返回true  为其他的返回false
+    isinstance(a,(int,float,str))  若a为元组里的任意一种返回true  其他返回false
+18、位运算符 （了解即可，需要时再进行查询）
+    & 按位与  | 按位或  ∧  按位异或  ~  按位取反  <<  左移  >>  右移
+    2 & 3 => 10 & 11 => 10 => 2 结果为2
+    2 | 3 => 10 | 11 => 11 => 3 结果为3
+    2 ∧ 3 => 10 ∧ 11 => 01 => 1 结果为1
+    ~ 3 按照规律 ~n => -(n+1)加1取反   即~2018=-2019, ~-2018=2017   
+    3 << 2 => 3 * 2**2 => 12   结果为12
+    16 >> 2 => 16 / 2**2 => 4  结果为4
+19、表达式 experession + operator + operand 的组合序列
+    表达式的优先级 or 与 and的优先级 and>or 1 or 2 and 3 = 1 => 1 or (2 and 3)
+    括号的优先级是最高的
+    一般的表达式都是左结合（从左到右）,只有存在赋值运算才是右结合（从右到左）
+    运算符的优先级 描述 从上到下 从左到右 优先级依次变小
+        **	指数 (最高优先级)
+        ~ + -	按位翻转, 一元加号和减号 (最后两个的方法名为 +@ 和 -@)
+        * / % //	乘，除，取模和取整除
+        + -	加法减法
+        >> <<	右移，左移运算符
+        &	位 'AND'
+        ^ |	位运算符
+        <= < > >=	比较运算符
+        <> == !=	等于运算符
+        = %= /= //= -= += *= **=	赋值运算符
+         is is not	身份运算符
+        in not in	成员运算符
+        not and or	逻辑运算符
+20、条件控制 if elif else 
+    input() 函数输入的都是为str格式的字符串
+    or 逻辑运算符  也可以返回我们想要的判断值，不只是可以用 if else 来返回判断值
+    pass 为占位代码块  代表什么都不做，在我们构建逻辑的时候再具体实现
+21、for 与 for else 循环
+    for else for循环体执行完毕后，才会执行else的代码块
+    break  遇见break直接跳出当前循环(也就是break位于的for循环，不包括外面一层循环)， continue 遇见continue不会执行后面的代码块，会执行下一次循环
+    break  也不会继续执行 else中的代码块，  但是continue是会执行最后的else代码块
+    break 与 continue 与if一般一起使用 
+22、for 与 range
+    for x in range(0,10，2)   0为起始数字，10为偏移总量， 2为步长， 用来实现循环几次
+    a = [1,2,3,4,5,6,7,8,9]  从1开始  隔一打印
+    for i in range(0，len(a),2)    ---    b = a(0:len(a):2)   =>  两种方式均可实现
+23、python的项目结构  包 模块 （类 函数、变量）
+    文件夹下面有一个 __init__.py 文件才代表这是一个包 内容可以什么都不写
+    import moudle.function，moudle.var,这样可以引进公共模块的变量和函数
+    公共文件中 加入 __all__ = ['var1','var2'] 然后对该模块进行引用  from m import * 只会引入var1 var2 其他的不会引入，需单独引入
+    括号 具有内括性 可以表示换行， 比如可以在导入模块变量多事时使用 
+    包下面的__init__文件  在引入的时候  会被自动调用一次，自动执行
+    同样的包下面的__all__ = ['c7','c8']表示时  在导入 * 的时候 只选择性的导入某一些模块
+    如果引入的内置的模块比较多，则可以写到一个包的__init__文件中，或者写入到一个公共模块中
+    不要重复导入包 模块， 避免出现循环导入  A导入B，而B又导入了A，或者通过其他模块引入A
+24、模块的内置变量 __name__, __file__, __package__,  __doc__
+    如果直接执行文件 __name__ == '__main__', 非直接执行表示 自己的文件名
+    print((data or "default")) 若data有值则返回data， 若data为none则返回"default"
+    入口文件 和 模块文件 入口文件的__name__ == 'main', 模块文件 不是一样
+25、相对导入和绝对导入 
+    相对导入 位于顶级包下面的二级包以及三级包下的模块可以进行相对导入 . .. ... .... 相对导入的路径表示
+    绝对导入，已经超越了顶级包的；另外一个包，则需要通过包名进行绝对引入
+    如果要把入口文件当成模块来运行，可以退出到.py文件的上一层，通过python -m moudle.xx.py来进行运行
+26、函数  1功能性  2隐藏细节  3可复用性
+    可返回任意类型的返回值，不需要进行返回结果的限定
+    function可返回多个结果，return res1, res2, res3 这样函数的返回结果的类型为tuple类型
+    如果有多个返回值，最好用多个参数进行接收，而不是一个参数  value1，value2， value3 = func(var1, var2, var3), 这样后面看代码才不会迷茫，变量命名要规范
+    序列解包 =>  a,b,c = 1,2,3 即赋值a,b,c为1,2,3 简洁又易懂   即元组的反用，就是序列解包  =>（但是元素的个数要相同）
+    链式赋值 a=b=c=1  即赋值1给a,b,c三个变量
+    关键字参数， 易于理解函数的参数的具体意义， 可任意改变参数的顺序
+    默认参数， function(name='default', age=default, college='default') ,可以传其中某个参数就可以了，形参后接=（等号）即为默认参数
+    ->并且非默认参数，不能再默认参数之后，应该最先定义非默认参数，后面清一色默认参数，并且形参会按照实参的顺序来解读，有默认参数下，若需传参数，
+    ->最好使用关键字进行传参
+    可变参数  关键符号`*`  相当于解包的概念func(*params) 表示可变参数，  但是若在这种情况下，要传入一个元组a=(1,2,3),可以解包 func(*a)即可
+    ->可变参数内部使用for  in  进行分拆运算
+    关键字可变参数  关键符号`**` 两个星号    内部调用 key,value 需调用dict的items方法才可以，不然遍历的都是dict的key值，若传入的本身为字典，
+    ->则在前面加上**
+27、局部变量，全局变量
+    在python中，方法中for循环中的变量，可以在方法中任何地方被引用，不同与java，不需要再循环体外面初始化变量的值
+    局部变量 在局部位置的优先级要大于 全局变量，大于上一级变量  如下代码  最先1 然后2 最后3  块级作用域>局部作用>全局作用域
+        c = 3
+        def func1():
+            # c = 2
+            def func2():
+                # c = 1
+                print(c)
+            func2()
+
+        func1()
+28、globa 关键字   global 可以将局部变量提升为全局变量
+29、类 实例方法 实例变量 类变量
+    封装代码， 类内部的方法 必须传入（self）参数，否则报错，类的内部不要调用方法，不然跟模块就没有区别了，类和实例化对象不要在同一个模块中
+    方法和函数的区别： 方法-> 设计层面    函数-> 程序运行 、过程式的一种称谓
+    类和对象  =>  关键 找对行为和特征 并进行面对对象的设计
+    类变量 和 实例变量的区别   类变量的意义在于对这个 模板的描述， 而实例变量是对对象的描述
+    类变量 和 实例变量的 找寻区别， 先找实例变量  不存在则找寻类变量
+    self => 如果类下面的方法为实例方法，则需要传入self参数，      调用实例方法的时候，不需要传入self
+    实例方法访问实例变量  最好使用self.name 进行访问， 实例方法访问类变量  ClassName.name 或 self.__class__.name 进行访问和修改
+30、类方法 静态方法
+    类方法@classmethod 传入参数为 cls ,在类方法里对类变量进行运算, python 允许对象调用类方法，但是不建议这样做
+    静态方法@staticmethod, 不用传入显示的参数（self,cls）,对象和类都可以调用， 可以访问类变量， 无法访问实例变量 （静态方法不建议使用）
+31、成员可见性
+    在方法和变量上加上 __ 两个下划线  即表示为私有变量或方法
+    如强行 student.__score = -1 则这里的__score是强行动态添加了一个属性__score 而不是原来的__score了，原来的私有变量名称变为_Student__score
+    -> 我们依然可以用改变后的名字 对其进行访问
+
+32、类的继承
+    子类调用父类的构造方法  还是需要传入 self参数，   其他方法通过super(Student, self).method()的方式进行调用
+    开闭原则    可以对类进行扩展  但是不要对类进行修改
+33、正则表达式  re 详见regex.py
+
+
+34、json JavaScript Object Sotation的简称  级JavaScript对象描述  详见requests_json.py
+    一种轻量级的数据交换格式(默念三遍)   易于解析  易于阅读  跨语言传输
+    json内部必须是双引号进行表示，因为这是跨语言的 交换数据格式，要满足所有的语言的字符串格式
+    json.loads() 反序列化  json.dumps() 序列化
+    json       ->  ECMASCRIPT的一种实现，一种轻量级的数据交换格式
+    json对象   ->   和json字符串可以进行序列化的对象格式（python里不存在json对象这一个说法）
+    json字符串 ->   符合json格式的字符串，就是json字符串
+    
+35、枚举（python2 没有此概念） 继承(Enum) from enum import Enum  详见 enum_demo.py
+    在枚举中，只关心标签，不关注具体的值，这就是枚举的意义,显示的知道具体的标签
+    枚举的比较运算  只支持 == 和 is 比较运算符  其他的运算符暂时不支持
+    在利用数据库存储枚举类型 我们直接存储对应的值，但是在代码中最好显式的指定枚举类标签，直管一点
+36、闭包  函数+环境变量 （函数定义时的外部变量即不是返回的函数的内部的变量，但不是全局变量） 返回函数时 一定要将现场也进行返回
+    详见  closure.py
+
+37、三元表达式
+    条件为真时的返回结果，if 判断条件 else 判断条件为false的返回结果
+38、filter  lambda的返回值 必须为布尔类型或者是能代表布尔类型的值 filter(lambda x:true if x==1 else false)
+
+
+39、装饰器   详见decorator.py
+40、爬虫
+    1、爬虫前奏
+        明确目的
+        找到对应数据的网页
+        分析网页的结构，找到对应数据的标签
+    2、代码前奏
+        模拟http强求，向对应的网页发送请求获取html数据
+        用正则表达式或相应的模块提取我们想要的数据
+    3、数据精炼
+        对爬回来的数据要有作用
+    4、了解 beautifulsoup, scrnpy 爬虫主页技术
+
+
+41、class的常见，最终由python调用type(name,(father.model),dict(funcname=func))函数执行的
+    1为class名称
+    2为class继承的父类，多重继承，单个用元组的单个元素表示法
+    3已创建的方法和方法名进行绑定
+
+42、python3 的web服务器的搭建 from http.server import HTTPServer, BaseHTTPRequestHandler 
+    详见 moudle\http_server 
+    对于server系列的代码 是自己通过重写 http.server.BaseHTTPRequestHandler 来实现自己的http服务，里面模拟了CGI的实现过程，以及一些异常处理
+    对默认界面 可加载界面 CGI接口.py文件, 做了很好的解释，重在理解http.server的使用
+    但是python3 本身就可以直接启动支持cgi接口的 http服务 通过如下命令开启 开启后直接支持 CGI服务 自己编写 cgi script脚本 进行业务实现
+        1.输入python -m http.server --cgi 命令打开默认端口8000   python -m http.server --cgi 8888 --bind 127.0.0.1
+        2.在打开默认端口的路径下建立一个名为cgi-bin的文件夹，把.py文件放到该文件夹下。
+        3.在浏览器中打开http://localhost:8000/cgi-bin/hello.py
+
+    tips:
+        1 获取当前文件__file__的路径
+        print "os.path.realpath(__file__)=%s" % os.path.realpath(__file__)
+        2 获取当前文件__file__的所在目录
+        print "os.path.dirname(os.path.realpath(__file__))=%s" % os.path.dirname(os.path.realpath(__file__)) 　　
+        3 获取当前文件__file__的所在目录
+        print "os.path.split(os.path.realpath(__file__))=%s" % os.path.split(os.path.realpath(__file__))[0]　
+        4 str与bytes的相互转换转换
+        str2bytes bytes(str, encoding="utf8")
+        bytes2str str(bytes, encoding="utf8")
+
+43、python3 模板引擎的搭建 详见 moudle/template_engine/*.py
+
+    tips: 
+        1、列表的extend(iter)的方法 code.extend([" " * 4, 'line', "\n"]) => ['    ', 'line', '\n'] 最后通过''.join(code)进行组合
+
+44、pillew 模块中的image argparse 在mudle/applications/photo2word.py 以及 mudle/pillew_demo 中进行认识
+    图像转符号画的实现 photo2word.py
+    
+45、二维码的生成 MYQR.myqr
+    myqr.run() 
+    参数列表  picture也可以为GIF动态图 对应输出的save_file也是GIF文件
+    参数	含义	详细
+    words	二维码指向链接	str，输入链接或者句子作为参数
+    version	边长	int，控制边长，范围是1到40，数字越大边长越大,默认边长是取决于你输入的信息的长度和使用的纠错等级
+    level	纠错等级	str，控制纠错水平，范围是L、M、Q、H，从左到右依次升高，默认纠错等级为'H'
+    picture	结合图片	str，将QR二维码图像与一张同目录下的图片相结合，产生一张黑白图片
+    colorized	颜色	bool，使产生的图片由黑白变为彩色的
+    contrast	对比度	float，调节图片的对比度，1.0 表示原始图片，更小的值表示更低对比度，更大反之。默认为1.0
+    brightness	亮度	float，调节图片的亮度，其余用法和取值与 contrast 相同
+    save_name	输出文件名	str，默认输出文件名是"qrcode.png"
+    save_dir	存储位置	str，默认存储位置是当前目录
+
+46、2048小游戏 curses random.randomrange randon.choice collections.defaultdict
+    
+
+    tips:
+    1、zip()压缩 与 zip(*) 理解为解压
+        a = [1,2,3]
+        b = [4,5,6]
+        c = [4,5,6,7,8]
+        zipped = zip(a,b)     # 打包为元组的列表
+        [(1, 4), (2, 5), (3, 6)]
+        zip(a,c)              # 元素个数与最短的列表一致
+        [(1, 4), (2, 5), (3, 6)]
+        zip(*zipped)          # 与 zip 相反，可理解为解压，返回二维矩阵式
+        [(1, 2, 3), (4, 5, 6)] zip(*field) 即为矩阵的转置
+    2、数字的格式化
+        数字	格式	输出	描述
+        3.1415926	{:.2f}	3.14	保留小数点后两位
+        3.1415926	{:+.2f}	+3.14	带符号保留小数点后两位
+        -1	{:+.2f}	-1.00	带符号保留小数点后两位
+        2.71828	{:.0f}	3	不带小数
+        5	{:0>2d}	05	数字补零 (填充左边, 宽度为2)
+        5	{:x<4d}	5xxx	数字补x (填充右边, 宽度为4)
+        10	{:x<4d}	10xx	数字补x (填充右边, 宽度为4)
+        1000000	{:,}	1,000,000	以逗号分隔的数字格式
+        0.25	{:.2%}	25.00%	百分比格式
+        1000000000	{:.2e}	1.00e+09	指数记法
+        13	{:10d}	        13	右对齐 (默认, 宽度为10)
+        13	{:<10d}	13	左对齐 (宽度为10)
+        13	{:^10d}	    13	中间对齐 (宽度为10)
+        11	
+        '{:b}'.format(11)   1011
+        '{:d}'.format(11)   11
+        '{:o}'.format(11)   13
+        '{:x}'.format(11)   b
+        '{:#x}'.format(11)  0xb
+        '{:#X}'.format(11)	0XB
+
+        ^, <, > 分别是居中、左对齐、右对齐，后面带宽度， : 号后面带填充的字符，只能是一个字符，不指定则默认是用空格填充。
+        + 表示在正数前显示 +，负数前显示 -；  （空格）表示在正数前加空格
+        b、d、o、x 分别是二进制、十进制、八进制、十六进制。
+    3、collections.defaultdict  
+        对于字典来说 如果要查找一个key不存在 则会抛出KeyError的异常 但有时候我们需要不存在的时候默认定义一个
+        defaultdict就提供了这样的功能
+
+        defaultdict(func) 接受一个参数， 当key不存在是 调用该func 给定一个默认的值
+
+47、application challenges 详见moudle/challenges
+    tips:
+    1、string.maketrans(str1, str2)
+        str.maketrans(str1, str2) 返回为str1 => str2 的映射表 str可以调用 text.translate(table)来对字符串进行相应的转换
+
+    2、
