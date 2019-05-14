@@ -62,14 +62,14 @@ class EsManager():
         return Elasticsearch(['%s:%s'%(ip,port)])
 
     def qurry(self,es,index,doc_type,query):
-        res = es.search(index=index, doc_type=doc_type,body=query5)
+        res = es.search(index=index, doc_type=doc_type,body=query4)
         return res
 
 
 EsManager = EsManager(ip,port)
 es = EsManager.getInestance()
 
-res = EsManager.qurry(es,'megacorp','employee',query5)
+res = EsManager.qurry(es,'megacorp','employee',query)
 print(res)
 
 
