@@ -64,8 +64,8 @@ agg_query = {"size":0, "aggs":{"all_interests":{"terms":{ "field": "interests" }
 # 修改对应的默认的设置 es.indices.put_mapping(index=, doc_type=, body=)
 set_mapping = {"properties":{"interests":{"type":"text","fielddata":True}}}
 print('--------------aggs-------------------')
-res = es.indices.put_mapping(index='megacorp',doc_type='employee',body=set_mapping)
-print(res)
+# res = es.indices.put_mapping(index='megacorp',doc_type='employee',body=set_mapping)
+# print(res)
 res = es.search(index='megacorp',doc_type='employee',body=agg_query)
 print(res)
 
@@ -107,7 +107,27 @@ res = es.search(index='megacorp',doc_type='employee',body=agg_twice_query)
 print(res)
 # 结果集
 data = res['aggregations']['all_interests']['buckets']
-
+print('-------------agg_twice_query_result-------------')
 print(sorted(data,key=lambda x: x['doc_count'], reverse=True))
+
+
+# es.mget 根据id一次性返回过个结果 _source 参数可以设置返回所需的字段
+mget_query = {
+    'docs':[{
+        '_index':'megacorp',
+        '_doc_type':'employee',
+        '_id':'AWozNixGrCQN1BwaEs8x'
+    },{
+         "_index" : "megacorp",
+         "_type" :  "employee",
+         "_id" :'AWozNi0prCQN1BwaEs80',
+         "_source": "age"
+      }]
+}
+mget_query2 = {'ids':['AWozNixGrCQN1BwaEs8x','AWozNi0prCQN1BwaEs80']}
+
+res = es.mget(body=mget_query)
+print(res)
+
 
 
