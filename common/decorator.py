@@ -1,4 +1,4 @@
-
+#encoding=utf8
 import threading
 import time
 import functools
