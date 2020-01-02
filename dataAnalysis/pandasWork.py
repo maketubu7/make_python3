@@ -80,7 +80,7 @@ def fromFakerPerson(num=1000):
 
 def fromFakerCall(num=1000):
     callSchema = ["start_phone","end_phone","num"]
-    sourceCall = tool.getFakerCall(20)
+    sourceCall = tool.getFakerCall(num)
     df = pd.DataFrame(sourceCall)
     df[callSchema].to_csv("E:\python_workspace\make_python3\data\call_detail.csv",index=None)
     return df[callSchema]
