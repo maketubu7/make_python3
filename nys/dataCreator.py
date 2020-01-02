@@ -65,7 +65,7 @@ def edge_from_node(start_df, end_df,edge_schema):
     return res
 
 vertex_zd = ['jid']
-def get_vertex_data(num=1000,tablename=None):
+def get_vertex_data(num=100000,tablename=None):
     if tablename:
         schema = vertex_table_info[tablename]
         infos = []

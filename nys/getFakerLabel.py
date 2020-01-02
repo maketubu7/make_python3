@@ -4,7 +4,7 @@
 # @Software: PyCharm
 
 import flask, json, logging, subprocess, sys
-
+from nys import dataCreator
 logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -12,10 +12,20 @@ server = flask.Flask(__name__)
 
 @server.route("/fakerLabel",methods=["get"])
 def run():
-    pass
+    label = flask.request.args.get("label")
+    num = int(flask.request.args.get("num"))
+    if label.startswith("edge"):
+        dataCreator.get_edge_data(label)
+        return json.dumps({'msg':'create %s success'%label,'msg_code':200})
+    else:
+        dataCreator.get_vertex_data(tablename=label,num=num)
+        return json.dumps({'msg': 'create %s success' % label, 'msg_code': 200})
+
 
 
 
 
 if __name__ == '__main__':
-    pass
+    port = int(sys.argv[1])
+    server.config["JSON_AS_ASCII"] = False
+    server.run(host='192.168.0.146',port=port,debug=True)
