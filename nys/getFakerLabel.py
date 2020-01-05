@@ -19,7 +19,7 @@ def run():
             dataCreator.get_edge_data(label)
             return json.dumps({'msg':'create %s success'%label,'msg_code':200})
         except:
-            return json.dumps({'msg':'fi you want create edges you must create nodes at first'%label,'msg_code':404})
+            return json.dumps({'msg':'if you want create edges you must create nodes at first'%label,'msg_code':404})
     else:
         dataCreator.get_vertex_data(tablename=label,num=num)
         return json.dumps({'msg': 'create %s success' % label, 'msg_code': 200})
