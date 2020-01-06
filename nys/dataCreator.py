@@ -119,10 +119,7 @@ vertex_zd = ['jid']
 def get_vertex_data(num=100000,tablename=None):
     if tablename:
         schema = vertex_table_info[tablename]
-        infos = []
-        for i in range(num):
-            info = createData(*schema)
-            infos.append(info)
+        infos = [createData(*schema) for _ in range(num)]
         df = pd.DataFrame(infos,columns=schema)
         df["jid"] = [jid(tablename,i) for i in range(len(df))]
         df.drop_duplicates(vertex_drop[tablename],inplace=True)
