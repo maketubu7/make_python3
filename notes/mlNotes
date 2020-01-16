@@ -167,6 +167,41 @@ machine learning
     np.partition(X,2,axis=0) 按列找到第二大的数
 
 
+模型基础
+1、参数
+    超参数：在算法运行前需要决定的参数，调参就是超参数
+        寻找好的超参数：领域知识，经验数值，试验搜索
+        在参数列表中计算最高准确度的参数（在参数列表中找到参数后，可以适当拓宽参数的范围）
+    模型参数：算法过程中学习的参数
+
+2、KNN算法
+    1、n_neigbers 计算距离的个数
+    2、距离权重考量 distance
+    3、距离参数 p 明可夫斯基距离的参数p p=1 为曼哈顿距离， p=2为欧拉距离
+    4、其他超参数 http://scikit-learn.org/stable/modules/generated/sklearn.neighbors.DistanceMetric.html
+
+3、网格搜索确定最好超参数
+    1、网格搜素参数 knn_clf 空参数KNN， param_grid参数列表， n_jobs 为工作的核数， verbose 打印搜索过程
+    grid_search = GridSearchCV(knn_clf, param_grid, n_jobs=-1, verbose=2)
+
+4、数据归一化（各个指标间的相互影响，有些尺度打，有的尺度小）
+    1、解决方案：把所有数据映射到统一尺度
+        1、最值归一化 normalization：把所有数据映射到0-1之间 x_scale = (x-x_min) / (x_max-x_min)
+            适用于分布有明显边界的情况；受outlier影响比较大
+        2、均值方差归一化 standardization:把所有的数据归一到均值为0方差为1的分布中
+            适用于分布没有明显的边界：有可能存在极端数据值 x_scale = x-x_mean / s
+    2、测试数据如何归一化
+        测试数据是模拟真实环境
+            真实环境很有可能无法得到所有测试的数据的均值和方差
+            对数据的归一化也是算话的一部分
+            (x_test - mean_train) / std_train
+        sklearn中的Scalar from sklearn.preprocessing import StandardScaler
+        工具处理归一化
+            standardScalar.fit(X_train)  理解为训练数据集
+            X_trains = tandardScalar.transform(X_train)  转化数据集为归一化数据集
+            X_test_standard = standardScalar.transform(X_test)  对测试数据集归一化
+            然后调用相关算法对数据集进行训练和测试
+
 
 
 
