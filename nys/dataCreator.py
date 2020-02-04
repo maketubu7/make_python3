@@ -113,10 +113,8 @@ def edge_from_common_node(start_df, end_df,edge_schema,tablename):
     res.drop_duplicates(edge_drop[tablename],inplace=True)
     return res
 
-
-
 vertex_zd = ['jid']
-def get_vertex_data(num=100000,tablename=None):
+def get_vertex_data(num=10000,tablename=None):
     if tablename:
         schema = vertex_table_info[tablename]
         infos = [createData(*schema) for _ in range(num)]
@@ -150,11 +148,12 @@ def get_edge_data(tablename=None):
 if __name__ == '__main__':
     # get_edge_data("edge_person_reserve_airline")
     # get_vertex_data(tablename="vertex_trainline",num=100)
-    # get_edge_data(tablename="edge_person_reserve_trainline")
-    # start_df = read_csv("edge_person_reserve_airline")
-    # end_df = read_csv("edge_person_reserve_airline")
-    # res = edge_from_tuili_node(start_df,end_df,["sfzh1","sfzh2","num"],1)
-    # print(res[0])
-    # print(df)
+#     # get_edge_data(tablename="edge_person_reserve_trainline")
+#     # start_df = read_csv("edge_person_reserve_airline")
+#     # end_df = read_csv("edge_person_reserve_airline")
+#     # res = edge_from_tuili_node(start_df,end_df,["sfzh1","sfzh2","num"],1)
+#     # print(res[0])
+#     # print(df)
+    get_vertex_data(tablename='vertex_person',num=100000)
 
-    get_edge_data(tablename="edge_person_withtrain_person")
+    # get_edge_data(tablename="edge_person_withtrain_person")

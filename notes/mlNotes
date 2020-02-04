@@ -189,7 +189,7 @@ machine learning
         1、最值归一化 normalization：把所有数据映射到0-1之间 x_scale = (x-x_min) / (x_max-x_min)
             适用于分布有明显边界的情况；受outlier影响比较大
         2、均值方差归一化 standardization:把所有的数据归一到均值为0方差为1的分布中
-            适用于分布没有明显的边界：有可能存在极端数据值 x_scale = x-x_mean / s
+            适用于分布没有明显的边界：有可能存在极端数据值 x_scale = x-x_mean / std
     2、测试数据如何归一化
         测试数据是模拟真实环境
             真实环境很有可能无法得到所有测试的数据的均值和方差
@@ -200,7 +200,120 @@ machine learning
             standardScalar.fit(X_train)  理解为训练数据集
             X_trains = tandardScalar.transform(X_train)  转化数据集为归一化数据集
             X_test_standard = standardScalar.transform(X_test)  对测试数据集归一化
+            ！！！注意，此时不能传入没有归一化的数据！ 不然结果非常的差
             然后调用相关算法对数据集进行训练和测试
+
+5、线性回归算法
+    1、特征
+        1、解决回归问题
+        2、许多强大的非线性算法的基础
+        3、具有强大的柯解释性
+        4、典型的参数学习
+        5、只能解决回归问题
+        6、对数据有假设： 存在线性关系 （对比KNN 对数据没有假设）
+    2、我们希望y^i 与 y_i 的差距尽量小，那么表达y^i 和 y_i的差距 （y_i 真值 y^i 预测值）
+        (y_i-y^i)^2 用差值的平方来表示
+        那么我们的目标就是他们的和尽可能的小, 及(y_i - ax_i -b)^2尽可能的小
+        损失函数（loss function）, 效用函数（utility function）
+        通过分析问题，确定问题的损失函数或者效用函数，通过最优化损失函数或者效用函数，获得机器学习的模型
+        近乎所有的参数学习算法都是这样的算法，比如
+        线性回归 svm 多项式回归 神经网络 逻辑回归 ----> 最优化原理
+
+    3、最小二乘法求解 最佳参数
+        找到a和b 使得(y_i - ax_i -b)^2的和尽可能的小 fit过程求解a与b的值
+        self.a_ = (x_train - x_mean).dot(y_train - y_mean) / (x_train - x_mean).dot(x_train - x_mean)
+        self.b_ = y_mean - self.a_ * x_mean
+
+    4、回归算法的评价
+        衡量标准（y_test_i - y_test^i）^2 求和
+        问题和求和的m相关，于是我们要求 均方误差 （mean squared error）（y_test_i - y_test^i）^2 / m
+        问题 量纲 于是我们要求 均方根误差 对均方误差开根号（mean squared error）（y_test_i - y_test^i）^2 / m 开根号
+        平均绝对误差 |y_test_i - y_test^i| 求和 除以 m (mean absolute error)
+        from sklearn.metrics import mean_squared_error 均方误差
+        from sklearn.metrics import mean_absolute_error 平均绝对误差
+
+        被sklearn引用的误差评价为 R^2 = 1-（ss_residual/ss_total）==> 1-SUM(y^i-y_i)^2/SUM(y_mean-y_i)^2
+        ss_residual 模型预测产生的错误
+        ss_total 使用Baseline mode 预测产生的误差
+
+        R^2 越大越好，当我们的预测模型不犯任何错误，R^2为最大值1
+        当我们的模型等于基准模型时，R^2 = 0
+        如果R^2 < 0 说明学习模型还不如基准模型，此时说明我们的数据不存在任何线性关系
+    5、优点
+        对数据具有强解释性，能看出各个特征的相关性
+
+6、多元线性回归(不需要数据归一化)
+    x^i = (x1^i,x2^i,x3^i,x4^i,x5^i,x6^i,....)
+    y = a1x1 + a2x2 + a3x3 + ... + anxn + b  求解系数a 与 b
+    a = (.....) a0 截距 a1-an 系数
+    a = (x_b^Tx_b)^-1x_b^Ty x_b 即为加了一个参数1 的特征向量集合
+    from sklearn.linear_model import LinearRegression
+
+7、梯度下降法
+    1、特征
+        不是一个机器学习算法
+         是一种基于搜索的最优化方法
+         作用 最小化已给损失函数
+         梯度上升法：最大化一个效用函数
+    2、寻找使得损失函数为最小值的参数系数
+        e 为学习率（learning rate）
+        e 的取值影响最优解的获取速度 太小减慢收敛的速度， 太大可能无法收敛
+        并不是所有的函数都有极值点
+        解决方案 多次运行，随机化初始化点， 梯度下降法的初始点也是一个超参数
+    3、核心理解代码
+        epsilon = 1e-8
+        eta = 0.1   # 学习率
+        def J(theta):  #损失函数
+            return (theta-2.5)**2 - 1.
+
+        def dJ(theta):   #原函数的导数
+            return 2*(theta-2.5)
+
+        theta = 0.0
+        while True:
+            gradient = dJ(theta)
+            last_theta = theta
+            theta = theta - eta * gradient
+
+            if(abs(J(theta) - J(last_theta)) < epsilon):
+                break
+    4、多元线性回归梯度下降法
+        def fit_gd(self, X_train, y_train, eta=0.01, n_iters=1e4):
+        """根据训练数据集X_train, y_train, 使用梯度下降法训练Linear Regression模型"""
+            assert X_train.shape[0] == y_train.shape[0], \
+            "the size of X_train must be equal to the size of y_train"
+
+            def J(theta, X_b, y):
+                try:
+                    return np.sum((y - X_b.dot(theta)) ** 2) / len(y)
+                except:
+                    return float('inf')
+
+            def dJ(theta, X_b, y):
+                res = np.empty(len(theta))
+                res[0] = np.sum(X_b.dot(theta) - y)
+                for i in range(1, len(theta)):
+                    res[i] = (X_b.dot(theta) - y).dot(X_b[:, i])
+                return res * 2 / len(X_b)
+
+            def gradient_descent(X_b, y, initial_theta, eta, n_iters=1e4, epsilon=1e-8):
+                theta = initial_theta
+                cur_iter = 0
+                while cur_iter < n_iters:
+                    gradient = dJ(theta, X_b, y)
+                    last_theta = theta
+                    theta = theta - eta * gradient
+                    if (abs(J(theta, X_b, y) - J(last_theta, X_b, y)) < epsilon):
+                        break
+                    cur_iter += 1
+                return theta
+
+            X_b = np.hstack([np.ones((len(X_train), 1)), X_train])
+            initial_theta = np.zeros(X_b.shape[1])
+            self._theta = gradient_descent(X_b, y_train, initial_theta, eta, n_iters)
+
+
+
 
 
 
