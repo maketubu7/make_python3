@@ -52,9 +52,9 @@ def read_csv(v):
     df = pd.read_csv(path(v))
     return df
 
-def sample_shuffle(df,edgeType="common"):
+def sample_shuffle(df,edgeType="commonLib"):
     '''减少数据并重复数据量'''
-    sampleRatio = 0.2 if edgeType != "common" else 0.5
+    sampleRatio = 0.2 if edgeType != "commonLib" else 0.5
     sampledf = df.sample(frac=sampleRatio)
     res = reduce(lambda x,y: pd.concat([x,y],axis=0),[sampledf for i in range(int(1/sampleRatio))])
     return res
@@ -85,7 +85,7 @@ def edge_from_tuili_node(start_df,end_df,edge_schema,tablename):
     return df
 
 def edge_from_common_node(start_df, end_df,edge_schema,tablename):
-    edgeType = 'pre_tuili' if tablename in edge_type["pre_tuili"] else "common"
+    edgeType = 'pre_tuili' if tablename in edge_type["pre_tuili"] else "commonLib"
     start_key = edge_schema[0]
     end_key = edge_schema[1]
     other_keys = edge_schema[2:]

@@ -13,7 +13,7 @@ vertex_index["vertex_company"] = 30000000
 vertex_index["vertex_trainline"] = 40000000
 
 edge_type = OrderedDict()
-edge_type["common"] = ["edge_phone_smz_person","edge_groupcall"]
+edge_type["commonLib"] = ["edge_phone_smz_person","edge_groupcall"]
 edge_type["pre_tuili"] = ["edge_person_reserve_airline","edge_person_work_company","edge_person_reserve_trainline"]
 edge_type["tuili"] = ["edge_person_withairline_person","edge_person_withtrain_person"]
 

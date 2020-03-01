@@ -295,6 +295,7 @@ machine learning
                 for i in range(1, len(theta)):
                     res[i] = (X_b.dot(theta) - y).dot(X_b[:, i])
                 return res * 2 / len(X_b)
+                return X_b.T.dot(X_b.dot(theta) - y) * 2. / len(y)  # 向量法
 
             def gradient_descent(X_b, y, initial_theta, eta, n_iters=1e4, epsilon=1e-8):
                 theta = initial_theta
@@ -312,7 +313,11 @@ machine learning
             initial_theta = np.zeros(X_b.shape[1])
             self._theta = gradient_descent(X_b, y_train, initial_theta, eta, n_iters)
 
-
+8、随机梯度下降法
+    1、特征
+        1、拥有不确定性
+        2、用空间换时间
+        3、学习率需要逐渐递减的，保证不会跳出极值点 模拟退火的思想 学习率如下 e = t0 / i_iters + t1
 
 
 
