@@ -114,4 +114,4 @@ if __name__ == '__main__':
     df2 = union_csvs(files)
     res = df_subtract_df(df,df2,subset=["phone"])
     save_csv(res,'result_filter')
-    # df_subtract_list(df,plist)
+    df_subtract_list(df,plist)
