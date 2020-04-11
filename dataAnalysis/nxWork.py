@@ -2,15 +2,28 @@
 # @Time    : 2019/12/27 11:25
 # @Author  : dengwenxing
 # @Software: PyCharm
+import functools
 
 import pandas as pd
 import networkx as nx
+from networkx import DiGraph
 import matplotlib.pyplot as plt
-from dataAnalysis.pandasWork import fromFakerCall
+# from dataAnalysis.pandasWork import fromFakerCall
 
 
 
 #从dataFramae中加载数据到图
+
+def get_graph():
+    callSchema = ["start_phone", "end_phone"]
+    call = pd.DataFrame([[1,2],[1,3],[1,4],[2,1],[2,3],[3,4],[3,1],[1,5]])
+    call.columns = callSchema
+    call[["start_phone", "end_phone"]] = call[["start_phone", "end_phone"]].astype(str)
+
+    G = nx.from_pandas_dataframe(call, "start_phone", "end_phone",create_using=DiGraph())
+    nx.write_graphml(G,'call.graphml')
+    return G
+
 def dealCallGraphUnDirected():
     callSchema = ["start_phone","end_phone","num"]
     call = pd.read_csv("E:\python_workspace\make_python3\data\call_detail.csv")
@@ -106,9 +119,22 @@ def dealCallGraphDirected():
     max_betweenness_centra = sorted(betweenness_centra.items(), key=lambda tp: float(tp[1]), reverse=True)[0]
     print("节点介数中心系数最大的点：", max_betweenness_centra)
 
+
+def pagerank_demo():
+    G = nx.read_graphml('call.graphml')
+    pos = nx.spring_layout(G)
+    nx.draw_networkx(G, pos)
+    plt.show()
+    # plt.savefig("g.pdf")
+    res = nx.pagerank(G)
+    return res
+
 if __name__ == '__main__':
-    dealCallGraphUnDirected()
-    dealCallGraphDirected()
+
+    res = pagerank_demo()
+    print(functools.reduce(lambda x,y:x+y,res.values()))
+    res = sorted(res.items(),key = lambda v:v[1],reverse=True)
+    print(res)
 
 
 

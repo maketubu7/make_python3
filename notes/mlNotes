@@ -207,7 +207,7 @@ machine learning
     1、特征
         1、解决回归问题
         2、许多强大的非线性算法的基础
-        3、具有强大的柯解释性
+        3、具有强大的可解释性
         4、典型的参数学习
         5、只能解决回归问题
         6、对数据有假设： 存在线性关系 （对比KNN 对数据没有假设）
@@ -284,18 +284,20 @@ machine learning
             "the size of X_train must be equal to the size of y_train"
 
             def J(theta, X_b, y):
+                ## 导数方程
                 try:
                     return np.sum((y - X_b.dot(theta)) ** 2) / len(y)
                 except:
                     return float('inf')
 
             def dJ(theta, X_b, y):
+                ## loss function
                 res = np.empty(len(theta))
                 res[0] = np.sum(X_b.dot(theta) - y)
                 for i in range(1, len(theta)):
                     res[i] = (X_b.dot(theta) - y).dot(X_b[:, i])
                 return res * 2 / len(X_b)
-                return X_b.T.dot(X_b.dot(theta) - y) * 2. / len(y)  # 向量法
+                ## return X_b.T.dot(X_b.dot(theta) - y) * 2. / len(y)  # 向量法求解
 
             def gradient_descent(X_b, y, initial_theta, eta, n_iters=1e4, epsilon=1e-8):
                 theta = initial_theta
@@ -317,7 +319,21 @@ machine learning
     1、特征
         1、拥有不确定性
         2、用空间换时间
-        3、学习率需要逐渐递减的，保证不会跳出极值点 模拟退火的思想 学习率如下 e = t0 / i_iters + t1
+        3、学习率需要逐渐递减的，保证不会跳出极值点 模拟退火的思想 学习率如下 e = t0 / (i_iters + t1)
+        学习率e = a/(i_iters+b) a b 可以看为随机梯度下降法的的超参数
+        4、在随机梯度中，，损失函数不能代表整个的方向，不能用来判断是否更接近极值点，不能用来终止迭代
+    2、梯度的调试
+        1、def dJ_debug(theta, X_b, y, epsilon=0.01): # 模拟导数的求法
+            res = np.empty(len(theta))
+            for i in range(len(theta)):
+                theta_1 = theta.copy()
+                theta_1[i] += epsilon
+                theta_2 = theta.copy()
+                theta_2[i] -= epsilon
+                res[i] = (J(theta_1, X_b, y) - J(theta_2, X_b, y)) / (2 * epsilon)
+            return res
+        2、def dJ_math(theta, X_b, y):  # 真实的的损失函数
+            return X_b.T.dot(X_b.dot(theta) - y) * 2. / len(y)
 
 
 

@@ -1,5 +1,6 @@
 import numpy as np
 from math import sqrt
+from sklearn.linear_model import SGDRegressor
 
 
 def accuracy_score(y_true, y_predict):

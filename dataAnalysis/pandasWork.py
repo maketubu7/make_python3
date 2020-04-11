@@ -25,9 +25,9 @@ def test():
     print(df1.dtypes)
 
     print("=======================筛选df[df['col'>value]]===========================")
-    # df2 = df2[df2["num"]<70]
-    # df1 = df1[df1["num"]>70]
-
+    df2 = df2[df2["num"]<70]
+    df1 = df1[df1["num"]>70]
+    df3 = df1[df1['num'].str.contains()]
     print(df1.head())
 
     print("====================插入一列 赋予新的值================")

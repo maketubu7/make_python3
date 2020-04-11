@@ -23,7 +23,7 @@ class LinearRegression:
         return self
 
     def fit_bgd(self, X_train, y_train, eta=0.01, n_iters=1e4):
-        """根据训练数据集X_train, y_train, 使用梯度下降法训练Linear Regression模型"""
+        """根据训练数据集X_train, y_train, 使用批量梯度下降法训练Linear Regression模型"""
         assert X_train.shape[0] == y_train.shape[0], \
             "the size of X_train must be equal to the size of y_train"
 
@@ -60,9 +60,9 @@ class LinearRegression:
         self.coef_ = self._theta[1:]
 
         return self
-
+    ## 随机梯度下降法
     def fit_sgd(self, X_train, y_train, n_iters=50, t0=5, t1=50):
-        """根据训练数据集X_train, y_train, 使用梯度下降法训练Linear Regression模型"""
+        """根据训练数据集X_train, y_train, 使用随机梯度下降法训练Linear Regression模型"""
         assert X_train.shape[0] == y_train.shape[0], \
             "the size of X_train must be equal to the size of y_train"
         assert n_iters >= 1
@@ -78,11 +78,13 @@ class LinearRegression:
             theta = initial_theta
             m = len(X_b)
             for i_iter in range(n_iters):
+                # 对样本的索引进行乱序排序，在对此索引进行全部检索
                 indexes = np.random.permutation(m)
                 X_b_new = X_b[indexes,:]
                 y_new = y[indexes]
                 for i in range(m):
                     gradient = dJ_sgd(theta, X_b_new[i], y_new[i])
+                    ## n_iter = i_iter * m + i
                     theta = theta - learning_rate(i_iter * m + i) * gradient
 
             return theta

@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+# @Time    : 2020/4/8 14:50
+# @Author  : Deng Wenxing
+# @Email   : dengwenxingae86@163.com
+# @File    : model_selection.py
+# @content : 测试数据集和训练数据集的分隔提取
+# @Software: PyCharm
+
 import numpy as np
 
 

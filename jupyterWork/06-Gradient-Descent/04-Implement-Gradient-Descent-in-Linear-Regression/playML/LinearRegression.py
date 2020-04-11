@@ -1,5 +1,5 @@
 import numpy as np
-from .metrics import r2_score
+# from .metrics import r2_score
 
 class LinearRegression:
 
@@ -35,7 +35,7 @@ class LinearRegression:
 
         def dJ(theta, X_b, y):
             res = np.empty(len(theta))
-            res[0] = np.sum(X_b.dot(theta) - y)
+            res[0] = np.sum(X_b.dot(theta) - y) # 第一次为偏差最大值
             for i in range(1, len(theta)):
                 res[i] = (X_b.dot(theta) - y).dot(X_b[:, i])
             return res * 2 / len(X_b)
@@ -83,3 +83,10 @@ class LinearRegression:
 
     def __repr__(self):
         return "LinearRegression()"
+
+if __name__ == '__main__':
+    lin = LinearRegression()
+    x = np.array([[1,2,3],[4,5,6],[7,8,9]])
+    y = np.array([6,15,24])
+    lin.fit_gd(x,y)
+    print(lin.predict(np.array([[3,4,5],])))
