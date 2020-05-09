@@ -175,14 +175,33 @@ machine learning
     模型参数：算法过程中学习的参数
 
 2、KNN算法
-    1、n_neigbers 计算距离的个数
+    1、n_neigbers 计算距离的个数,个数越小 模型越复杂，决策边界很碎化
     2、距离权重考量 distance
     3、距离参数 p 明可夫斯基距离的参数p p=1 为曼哈顿距离， p=2为欧拉距离
     4、其他超参数 http://scikit-learn.org/stable/modules/generated/sklearn.neighbors.DistanceMetric.html
 
 3、网格搜索确定最好超参数
     1、网格搜素参数 knn_clf 空参数KNN， param_grid参数列表， n_jobs 为工作的核数， verbose 打印搜索过程
+    对 knn的线性回归算法进行超参数搜索步骤
     grid_search = GridSearchCV(knn_clf, param_grid, n_jobs=-1, verbose=2)
+    param_grid = [
+    {
+        "weights": ["uniform"],
+        "n_neighbors": [i for i in range(1, 11)]
+    },
+    {
+        "weights": ["distance"],
+        "n_neighbors": [i for i in range(1, 11)],
+            "p": [i for i in range(1,6)]
+        }
+    ]
+
+    knn_reg = KNeighborsRegressor()
+    grid_search = GridSearchCV(knn_reg, param_grid, n_jobs=-1, verbose=1)
+    grid_search.fit(X_train_standard, y_train)
+    grid_search.best_params_  最优超参数
+    grid_search.best_score_  最优分(但是不是模型最终的准确度)
+    grid_search.best_estimator_.score(X_test_standard, y_test) 最终的准确度
 
 4、数据归一化（各个指标间的相互影响，有些尺度打，有的尺度小）
     1、解决方案：把所有数据映射到统一尺度
@@ -220,22 +239,38 @@ machine learning
         线性回归 svm 多项式回归 神经网络 逻辑回归 ----> 最优化原理
 
     3、最小二乘法求解 最佳参数
-        找到a和b 使得(y_i - ax_i -b)^2的和尽可能的小 fit过程求解a与b的值
+        普通解法:
+            x_mean = np.mean(x_train)
+            y_mean = np.mean(y_train)
+
+            num = 0.0
+            d = 0.0
+            for x, y in zip(x_train, y_train):
+                num += (x - x_mean) * (y - y_mean)
+                d += (x - x_mean) ** 2
+
+            self.a_ = num / d
+            self.b_ = y_mean - self.a_ * x_mean
+        向量解:
+        找到a和b 使得(y_i - ax_i -b)^2的和尽可能的小 向量fit过程求解a与b的值
         self.a_ = (x_train - x_mean).dot(y_train - y_mean) / (x_train - x_mean).dot(x_train - x_mean)
         self.b_ = y_mean - self.a_ * x_mean
 
     4、回归算法的评价
         衡量标准（y_test_i - y_test^i）^2 求和
+        mse = sum((y_test_i - y_test^i)^2) / m 均方误差
+        rmse = sqrt(mse) 均方根误差 误差量纲值
+        mae = sum(|y_test_i - y_test^i|) / m 平均绝对误差 误差量纲值
         问题和求和的m相关，于是我们要求 均方误差 （mean squared error）（y_test_i - y_test^i）^2 / m
         问题 量纲 于是我们要求 均方根误差 对均方误差开根号（mean squared error）（y_test_i - y_test^i）^2 / m 开根号
         平均绝对误差 |y_test_i - y_test^i| 求和 除以 m (mean absolute error)
-        from sklearn.metrics import mean_squared_error 均方误差
-        from sklearn.metrics import mean_absolute_error 平均绝对误差
+        from sklearn.metrics import mean_squared_error 均方误差mean_squared_error(y_test,y_predict)
+        from sklearn.metrics import mean_absolute_error 平均绝对误差mean_absolute_error(y_test,y_predict)
 
         被sklearn引用的误差评价为 R^2 = 1-（ss_residual/ss_total）==> 1-SUM(y^i-y_i)^2/SUM(y_mean-y_i)^2
-        ss_residual 模型预测产生的错误
-        ss_total 使用Baseline mode 预测产生的误差
-
+        ss_residual 模型预测产生的错误 (拟合住的部分)
+        ss_total 使用Baseline mode 预测产生的误差 (暴力的将平均值作为所有数值的平均值，误差很大)
+        from sklearn.metrics import r2_score r2_score(y_true,y_pridect)
         R^2 越大越好，当我们的预测模型不犯任何错误，R^2为最大值1
         当我们的模型等于基准模型时，R^2 = 0
         如果R^2 < 0 说明学习模型还不如基准模型，此时说明我们的数据不存在任何线性关系
@@ -243,10 +278,14 @@ machine learning
         对数据具有强解释性，能看出各个特征的相关性
 
 6、多元线性回归(不需要数据归一化)
+    行 样本 列 特征
     x^i = (x1^i,x2^i,x3^i,x4^i,x5^i,x6^i,....)
     y = a1x1 + a2x2 + a3x3 + ... + anxn + b  求解系数a 与 b
     a = (.....) a0 截距 a1-an 系数
-    a = (x_b^Tx_b)^-1x_b^Ty x_b 即为加了一个参数1 的特征向量集合
+    x_b = np.hstack([np.ones(len(x),1),x])  增加一列 i 表示常数参数
+    a = (x_b^T.x_b)^-1.x_b^T.y x_b 即为加了一个参数1 的特征向量集合 (a0,a1...an) ^-1表示为逆矩阵 . 表示dot
+    上述为多元线性回归的正规方程解(normal equation)，但是其算法的复杂度非常高on^3, \
+    其优点是不用对数据做归一化处理
     from sklearn.linear_model import LinearRegression
 
 7、梯度下降法
@@ -261,15 +300,18 @@ machine learning
         并不是所有的函数都有极值点
         解决方案 多次运行，随机化初始化点， 梯度下降法的初始点也是一个超参数
     3、核心理解代码
+        导数代表theta单位变化时，J(损失函数)相应的变化
+        导数(梯度)可以代表方向，对应J增大的方向
         epsilon = 1e-8
         eta = 0.1   # 学习率
         def J(theta):  #损失函数
             return (theta-2.5)**2 - 1.
 
-        def dJ(theta):   #原函数的导数
+        def dJ(theta):   #损失函数的导数
             return 2*(theta-2.5)
 
         theta = 0.0
+        epsilon = 1e-8
         while True:
             gradient = dJ(theta)
             last_theta = theta
@@ -277,21 +319,31 @@ machine learning
 
             if(abs(J(theta) - J(last_theta)) < epsilon):
                 break
+
     4、多元线性回归梯度下降法
+        参数方程求解过程 推到过程见图片
+            J(theta)=MSE(y,y^) 这就是目标损失函数 sum((y_test_i - y_test^i)^2) / m
+            这是梯度求解方程的表示 X_b.T.dot(X_b.dot(theta) - y) * 2. / len(y)
+        批量梯度进行多元线性求解，则必须进行数据的归一化，
+        standardScalar.fit(X_train)  理解为训练数据集
+        X_train_standard = tandardScalar.transform(X_train)  转化数据集为归一化数据集
+        X_test_standard = standardScalar.transform(X_test)
+        最后才可以看出模型的具体r2_csore r2_score(x_test_standard,y_test)
+
         def fit_gd(self, X_train, y_train, eta=0.01, n_iters=1e4):
-        """根据训练数据集X_train, y_train, 使用梯度下降法训练Linear Regression模型"""
+        """根据训练数据集X_train, y_train, 使用批量梯度下降法训练Linear Regression模型"""
             assert X_train.shape[0] == y_train.shape[0], \
             "the size of X_train must be equal to the size of y_train"
 
             def J(theta, X_b, y):
-                ## 导数方程
+                ## 损失函数
                 try:
                     return np.sum((y - X_b.dot(theta)) ** 2) / len(y)
                 except:
                     return float('inf')
 
             def dJ(theta, X_b, y):
-                ## loss function
+                ## 梯度函数
                 res = np.empty(len(theta))
                 res[0] = np.sum(X_b.dot(theta) - y)
                 for i in range(1, len(theta)):
@@ -300,6 +352,7 @@ machine learning
                 ## return X_b.T.dot(X_b.dot(theta) - y) * 2. / len(y)  # 向量法求解
 
             def gradient_descent(X_b, y, initial_theta, eta, n_iters=1e4, epsilon=1e-8):
+                # 梯度下降法函数
                 theta = initial_theta
                 cur_iter = 0
                 while cur_iter < n_iters:
@@ -335,6 +388,223 @@ machine learning
         2、def dJ_math(theta, X_b, y):  # 真实的的损失函数
             return X_b.T.dot(X_b.dot(theta) - y) * 2. / len(y)
 
+9、主成分分析法 PCA分析
+    1、特点
+        非监督学习
+        主要用于数据的降维
+        通过降维，可以发现更便于人类理解的特征
+        其他应用 可视化 去噪
+    2、方法
+        降维 如何找到让样本间间距最大的轴
+        如何定义样本间间距
+        使用方差？
+            1、将样例的均值归为0(demean)
+            2、求轴的方向 w = (w1,w2)
+            3、来到了目标函数最优化的问题 求w使得 var(x_project) = 1/m * （sum(sum(x_i_j.w_j)^2)) 最大
+            4、上述问题运用梯度上升法解决
+            5、公司求解过程
+                =对应目标函数的向量化梯度函数为 x^T.(X.w) * 2 / m 为一个长度为m的行向量
+                f(w,x)=np.sum(X.dot(w)**2) / len(X)  目标函数
+                df_math(w,x)=X.T.dot(X.dot(w)) * 2. / len(X) 梯度函数
+            6、二维降维到一维的主成分向量 w(v1,v2) 及第一主成分保持样本间间距最大
+            7、求出第一主成分，将数据在第一个主成分的分量去掉 及 x_i-x_i_project = x^
+                x_i x的原始值，x_i_project第一主成分 x^ 去掉第一主成分的结果
+                X2 = X - X.dot(w).reshape(-1, 1) * w 求出第一主成分后，根据这个求出 新的数据
+            8、对新的数据上继续对x^求第一主成分
+    3、高维数据向低纬数据映射
+        1、前n个主成分，每个主成分为长度为n的向量
+        2、FCA(n) 也就是将多维特征降维到n维，降维后进行数据的训练，比如
+            pca = PCA(n_components=n)
+            pca.fit(X_train)
+            X_train_reduction = pca.transform(X_train)
+            X_test_reduction = pca.transform(X_test)
+            ##先对64维降维到2维，在对数据进行knn训练，可以快速进行训练
+            ？？ 那么降低到多少维才是最好的呢
+            knn_clf = KNeighborsClassifier()
+            knn_clf.fit(X_train_reduction, y_train)
+        3、sklearn中自带了一个参数可以进行验证 explained_variance_ratio_
+            结果为每一个纬度维持了原来的方差的所占比例
+            于是可以在初始化pca时，指定你想要维持的占比(0-1的数)
+            sk_pca = SK_PCA(0.95) 指定你想要维持的占比为95%
+            sk_pca.n_components 为最后所得得纬度
+            这样可以大大节约模型训练的时间，同时精度损失又在我们接受的范围内
+            PCA不仅降低了特征的纬度，同时也对特征进行了降噪，去除了噪声信息，反而可能会提高精度
+        4、应用
+            1、人脸识别
+            2、手写识别
+
+10、多项式回归
+    1、对数据进行升幂操作的，具体升多少据情况而定
+        from sklearn.preprocessing import PolynomialFeatures
+        poly = PolynomialFeatures(degree=2)  ## 需要增加最多几次幂的特征
+        poly.fit(X)
+        ## 升幂后的x的特征值
+        X2 = poly.transform(X)
+    2、升幂的操作原理
+        [[1,2],[3,4]] => PolynomialFeatures(degree=2) [[1,1,2,1,2,4],[1,3,4,9,12,16]]
+        2个特征对应的值 x^0,x1^1,x2^1,x1^2,x1*x2,x2^2
+        3个特征对应的值 x^0,x1^1,x2^1,x3^2,x1^2,x1*x2,x1*x3,x2^2,x2*x3,x3^2
+        [[1,2],[3,4]] => PolynomialFeatures(degree=3)
+        [[1.,1.,2.,1.,2.,4.,1.,2.,4.,8.],
+        [1.,3.,4.,9.,12.,16.,27.,36.,48.,64.]]
+        2个特征对应的值 x^0,x1^1,x2^1,x1^2,x1*x2,x2^2,x1^3,x1^2*x2,x2^2*x1,x2^3
+    3、对升幂后的特征值进行训练
+        lir = LinearRegression()
+        # 对升幂后的x特征值，进行训练
+        lir.fit(X2,y)
+        print(lir.coef_)
+    4、如果升幂过高，会发现数据间的差异会变得很大，用Pileline来解决
+        创建一个多项式回归的对象poly_reg
+        from sklearn.pipeline import Pipeline  ## 顺序执行
+        from sklearn.preprocessing import StandardScaler
+        ##创建一个多项式回归的对象poly_reg
+        poly_reg = Pipeline([
+            ("poly", PolynomialFeatures(degree=2)),
+            ("std_scaler", StandardScaler()),
+            ("lin_reg", LinearRegression())])
+    5、欠拟合(underfitting)和过拟合(overfitting)
+        1、欠拟合均方误差比较大，拟合的不够好，训练的模型不能完整的表述数据关系
+        2、过拟合，整体均方误差较小，为了能拟合的过好，将细节放大，过多的表达了数据间的噪音关系
+        3、这里可以发现，机器学习，主要是为了解决过拟合的问题
+    6、模型的泛化能力
+        1、对训练数据可以拟合的非常好，但是对新数据的预测能力就比较弱
+            这个模型的泛化能力就非常差，可能就遭遇了过拟合的问题
+        2、对训练数据可以拟合的非常好，但是对新数据的预测能力也很强
+            这个模型的泛化能力就非常好
+        3、这里就体现了 train test split的意义
+        4、随着模型的复杂度的提升是从欠拟合到过拟合的过程，是一个反U形曲线
+        5、要寻找模型泛化能力最好的地方，即准确率最高的地方(模型复杂度曲线)
+        6、学习曲线，随着训练样本的逐渐增多，算法训练出的模型的表现能力
+            随着样本的增多，训练数据的均方误差与测试数据的均方误差(两条折线图)
+        7、测试数据集的意义，通过调整超参数(degree)来确定最好的测试准确度
+            问题，怎么确定针对测试数据集是否过拟合？
+            增加验证数据集，查看效果，-->调整超参数使用的数据集
+            --> 测试数据集作为最终模型性能的数据集
+        8、交叉验证(cross validation)
+            解决了测试数据发生了过拟合却不自知的情况
+            训练数据集 A B C K=(3,5,10 ...) 称为k-folds cross validation
+            AB 训练 C 验证，AC训练 B验证，BC训练 A验证 --> 将得到的K个模型的结果作为结果调参(超参数)
+            from sklearn.model_selection import cross_val_score 官方交叉验证
+            cross_val_score(knn_clf, X_train, y_train, cv=5) cv是将训练数据集分成几份
+            GridSearchCV 中的CV就是使用的 交叉验证的机制 cv的也可以进行参数控制
+            GridSearchCV(knn_clf, param_grid, verbose=1, cv=5)
+            缺点 每次训练k个模型，相当于整体性能满了K倍
+            留一法(Leave-One-Out Cross Validation LOO-CV)
+                把训练数据集分成m(m=样本数量)份，成为留一法，完全不受随机的影响，最接近模型真正的性能指标
+                缺点 计算量巨大
+        9、偏差方差权衡(Bias Variance Trade Off)
+            偏差：每个样本都离目标点又很大的误差
+            方差：整个样本的离散程度，整体集中则方差低，整体离散则方差高
+            模型误差 = 偏差(Bias) + 方差(Variance) + 不可避免的误差
+            偏差的主要原因：
+                1、对问题本身的假设不成立，比如非线性问题使用线性回归
+                2、欠拟合
+                3、目标样本与标签不匹配
+            方差的主要原因(数据的一点点扰动都会较大的影响模型)
+                1、使用的模型太复杂
+                2、过拟合 overfitting
+                非参数学习基本都是高方差算法，因为不对数据进行任何假设
+                参数学习通常都是高偏差算法，因为堆数据具有极强的假设
+                但是大多数算法都具有相应得参数，可以调整方差和偏差，如knn得k,线性回归中使用多项式回归，但是偏差和方差
+                通常都是矛盾的，降低一方会提高另一方
+            机器学习得主要挑战，来自于方差，解决手段
+                1、降低模型复杂度
+                2、减少数据维度，降噪
+                3、增加样本数
+                4、使用验证集
+                5、模型正则化
+        10、模型正则化(Regularization)
+                定义：限制参数的大小,使得θ参数尽可能的小
+                岭回归:又称脊回归、吉洪诺夫正则化（Tikhonov regularization），
+                    是对不适定问题（ill-posed problem)进行回归分析时最经常使用的一种正则化方法
+                    在存在共线性问题和病态数据偏多的研究中有较大的实用价值
+                套索回归：
+                    LASSO Regularization(Least Absolute Shrinkage and Selection Operator Regression)
+                    它类似于岭回归，也会就回归系数向量给出惩罚值项。此外，它能够减少变化程度并提高线性回归模型
+                        的精度，LASSO趋向于使得一部分theta值变为0,所以可作为特征选择用，
+                就精度而言 岭回归的准确度要高于LASSO,但是如果在特征数特别多的情况下，LASSO会起到一定的作用
+        11、L1正则 L2正则
+                则对推 Ridge 应该为L2正则项	LASSO为L1正则项
+        12、弹性网(Elastic Net)
+            对一个损失函数，加上一个L1正则，同时加上L2正则进行优化，同时进行方差与偏差的调优
+
+11、逻辑回归(Logistic Regression)
+    1、逻辑回归既可以看作时回归算法，也可以看作为分类算法，
+        通常用作分类算法用，只可以解决二分类问题
+    2、对于给定的样本数据集，X,y,我们如何找到参数theta,使得用这样的方式，
+        可以最大程度获得样本数据集X对应的分类输出y
+    3、决策边界
+        对于求出的参数theta coef_ = (θ1,θ2) intercept_ = θ0
+        y = -(θ0+θ1x)/θ2
+    4、使用多项式回归进行逻辑回归
+        from sklearn.preprocessing import PolynomialFeatures
+        from sklearn.pipeline import Pipeline
+        from sklearn.preprocessing import StandardScaler
+
+        def PolynomialLogisticRegression(degree):
+            return Pipeline([
+                ('poly', PolynomialFeatures(degree=degree)),
+                ('std_scaler', StandardScaler()),
+                ('log_reg', LogisticRegression())
+            ])
+    5、逻辑回归中使用正则化
+        再skleaern中的方式
+        from sklearn.preprocessing import PolynomialFeatures
+        from sklearn.pipeline import Pipeline
+        from sklearn.preprocessing import StandardScaler
+
+        def PolynomialLogisticRegression(degree):
+            return Pipeline([
+                ('poly', PolynomialFeatures(degree=degree)),
+                ('std_scaler', StandardScaler()),
+                ('log_reg', LogisticRegression())
+            ])
+            ## 这里的C就是模型正则化公式里的系数大C
+        def PolynomialLogisticRegression(degree, C, penalty='l2'):
+            return Pipeline([
+                ('poly', PolynomialFeatures(degree=degree)),
+                ('std_scaler', StandardScaler()),
+                ('log_reg', LogisticRegression(C=C, penalty=penalty))
+            ])
+    6、多分类改造,场景OVR(One vs Rest),OVO(One vs One)
+        ovr:每一次选择其中一个类别，和剩余其他类别就是分为了两个类别，n个类别就进行n次分类，选择得分最高的
+        ovo:每一次选择其中两个类别，n个类别就进行C(n,2)次分类，选择赢数最高的分类，分类次数更多，耗时更长，但结果更准确
+        创建ovr,ovo的两种方式
+        def ovr_ovo_demo(multi_class='ovr',solver='lbfgs'):
+            from sklearn.linear_model import LogisticRegression
+
+            def PolynomialLogisticRegression(degree, multi_class=multi_class,solver=solver):
+                return Pipeline([
+                    ('poly', PolynomialFeatures(degree=degree)),
+                    ('std_scaler', StandardScaler()),
+                    ('log_reg', LogisticRegression(multi_class=multi_class,solver=solver))])
+            log_reg = PolynomialLogisticRegression(1,multi_class=multi_class,solver=solver)
+            log_reg.fit(X_train,y_train)
+            print(multi_class,log_reg.score(X_test,y_test))
+
+        def ovr_ovo_demo2(type = 'ovr'):
+            def PolynomialLogisticRegression(degree):
+                return Pipeline([
+                    ('poly', PolynomialFeatures(degree=degree)),
+                    ('std_scaler', StandardScaler()),
+                    ('log_reg', LogisticRegression())])
+            log_reg = PolynomialLogisticRegression(1)
+            reg = OneVsRestClassifier(log_reg)
+            if type != 'ovr':
+                reg = OneVsOneClassifier(log_reg)
+
+            reg.fit(X_train,y_train)
+            print(type,reg.score(X_test,y_test))
+
+12、分类算法的评价
+    1、对于极度偏移的数据，只使用分类准确度是远远不够的
+    2、使用工具 混淆矩阵(Confusion Matrix)
+        表示真实值与预测值的对应关系详见typora文档
+    3、sklearn中的混淆矩阵及相关指标计算
+        from sklearn.metrics import confusion_matrix
+        from sklearn.metrics import precision_score
+        from sklearn.metrics import recall_score
+        from sklearn.metrics import f1_score
 
 
 
