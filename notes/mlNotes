@@ -175,6 +175,7 @@ machine learning
     模型参数：算法过程中学习的参数
 
 2、KNN算法
+    需要对数据进行标准化
     1、n_neigbers 计算距离的个数,个数越小 模型越复杂，决策边界很碎化
     2、距离权重考量 distance
     3、距离参数 p 明可夫斯基距离的参数p p=1 为曼哈顿距离， p=2为欧拉距离
@@ -605,6 +606,46 @@ machine learning
         from sklearn.metrics import precision_score
         from sklearn.metrics import recall_score
         from sklearn.metrics import f1_score
+    4、精准度和召回率的相互调和
+        1、通过调整阈值，来对两个指标产生影响
+        2、通过召回率曲线和精确率曲线来判断最佳的阈值取值
+        3、Precision-Recall 曲线 来发现最好的平衡位置--PRC曲线
+            from sklearn.metrics import precision_recall_curve
+            precisions, recalls, thresholds = precision_recall_curve(y_test, decision_scores)
+            plot.plt(thresholds,precisions[:-1])
+            plot.plt(thresholds,recalls[:-1])
+            plt.show() #绘制Precision-Recall 曲线 可以直观看到整个曲线的走势
+        4、ROC曲线
+            TPR = recall = TP/(TN+FP)
+            FPR = FP / (TN+FP)
+            from sklearn.metrics import roc_curve
+            fprs, tprs, thresholds = roc_curve(y_test, decision_scores)
+            plt.plot(fprs,tprs)
+            plt.show()
+            ## 面积接口 ROC UAC判断模型的优劣根据面积
+            from sklearn.metrics import roc_auc_score
+            roc_auc_score(y_test,decision_score)
+        5、多分类的混淆矩阵
+            ##多分类问题的准确度
+            precision_score(y_test, y_predict, average="micro")
+            ##多分类的混淆矩阵
+            cfm = confusion_matrix(y_test, y_predict)
+            plt.matshow(cfm, cmap=plt.cm.gray)
+            plt.show()
+            ##多分类的错误矩阵，可以看出出现的问题具体体现在哪里
+            row_sums = np.sum(cfm, axis=1)
+            err_matrix = cfm / row_sums
+            np.fill_diagonal(err_matrix, 0)
+            plt.matshow(err_matrix, cmap=plt.cm.gray)
+            plt.show()
+        6、我们应该要清楚，在机器学习的算法中，很多时候出现的问题，要回到我们的数据中去查找原因，
+            搞清楚为什么会判断错误
+13、支撑向量机 SVM(Support Vector Machine)
+    1、SVM尝试寻找一个最优的决策边界，距离两个类别的最近的样本最远
+        那些最近的点就称为支撑向量，SVM要最大化maggin，解决的是线性可分问题
+    2、Hard Maegin SVM 解决的是线性二分类问题
+    3、Soft Margin和SVM的正则化
+        解决非线性可分的问题，存在特殊点使得决策平面无法求解
 
 
 

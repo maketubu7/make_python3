@@ -57,6 +57,24 @@ def f1_score(y_test,y_pridect):
     except:
         return 0.0
 
+
+def FPR(y_test,y_pridect):
+    fP = FP(y_test,y_pridect)
+    tn = TN(y_test,y_pridect)
+    try:
+        return fP/(tn+fP)
+    except:
+        return 0.0
+
+def TPR(y_test,y_pridect):
+    fn = FN(y_test,y_pridect)
+    tp = TP(y_test,y_pridect)
+    try:
+        return tp/(tp+fn)
+    except:
+        return 0.0
+
+
 def matrix_demo():
     digits = datasets.load_digits()
     X = digits.data

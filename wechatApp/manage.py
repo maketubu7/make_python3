@@ -15,7 +15,6 @@ manager.add_command("runserver", Server(host='127.0.0.1',port=8888,use_debugger=
 def main():
     manager.run()
 
-
 if __name__ == "__main__":
     try:
         sys.exit(main())
