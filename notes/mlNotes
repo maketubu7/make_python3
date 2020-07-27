@@ -494,7 +494,7 @@ machine learning
                 把训练数据集分成m(m=样本数量)份，成为留一法，完全不受随机的影响，最接近模型真正的性能指标
                 缺点 计算量巨大
         9、偏差方差权衡(Bias Variance Trade Off)
-            偏差：每个样本都离目标点又很大的误差
+            偏差：每个样本都离目标点有很大的误差
             方差：整个样本的离散程度，整体集中则方差低，整体离散则方差高
             模型误差 = 偏差(Bias) + 方差(Variance) + 不可避免的误差
             偏差的主要原因：
@@ -505,7 +505,7 @@ machine learning
                 1、使用的模型太复杂
                 2、过拟合 overfitting
                 非参数学习基本都是高方差算法，因为不对数据进行任何假设
-                参数学习通常都是高偏差算法，因为堆数据具有极强的假设
+                参数学习通常都是高偏差算法，因为对数据具有极强的假设
                 但是大多数算法都具有相应得参数，可以调整方差和偏差，如knn得k,线性回归中使用多项式回归，但是偏差和方差
                 通常都是矛盾的，降低一方会提高另一方
             机器学习得主要挑战，来自于方差，解决手段
@@ -643,9 +643,38 @@ machine learning
 13、支撑向量机 SVM(Support Vector Machine)
     1、SVM尝试寻找一个最优的决策边界，距离两个类别的最近的样本最远
         那些最近的点就称为支撑向量，SVM要最大化maggin，解决的是线性可分问题
-    2、Hard Maegin SVM 解决的是线性二分类问题
+    2、Hard Margin SVM 解决的是线性二分类问题
+        有条件的最优化问题，详细见图
     3、Soft Margin和SVM的正则化
+        拥有更大容错的svm模型
         解决非线性可分的问题，存在特殊点使得决策平面无法求解
+    4、skleaern中的svm
+        ## 因为涉及到距离的收敛，对训练数据集，必须进行标准化
+        from sklearn.preprocessing import StandardScaler
+        from sklearn.svm import LinearSVC
+        ## 数据标准化
+        standardScaler = StandardScaler()
+        standardScaler.fit(X)
+        X_standard = standardScaler.transform(X)
+        ## 训练数据
+        svc = LinearSVC(C=1e9)
+        svc.fit(X_standard, y)
+    5、引入多项式特征和核函数
+        核函数：kernel='rbf' 为 径向基核函数或者高斯核函数
+        将数据映射到无限高维空间 => 解决将线性不可分的问题转换为线性可分的问题
+        将m*n的数据转化为m*m，因为m的个数可能为无限个，也就是无限高维
+        在nlp领域，有比较高的优势
+
+    决策树
+    概念：
+        1、非参数学习算法
+        2、可以解决分类问题，天然解决多分类问题
+        3、也可以解决回归问题
+        4、非常好的可解释性
+    信息熵：代表不确定度的度量，熵越大，
+        1、随机数据的不确定性越高，熵越大
+        2、随机数据的不确定性越小，熵越小
+
 
 
 
